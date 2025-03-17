@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -8,6 +7,12 @@ using UnityEngine.XR.ARSubsystems;
 
 namespace UnityEngine.XR.ARFoundation.Samples
 {
+    /// <summary>
+    /// This class provides functionality to test persistent anchors in valid contexts
+    /// only. For example, if an anchor was created but never saved then there will be
+    /// a button enabled to save an anchor. If an anchor was saved, then there will be
+    /// buttons enabled to load and erase the anchor.
+    /// </summary>
     public class AnchorScrollViewEntry : MonoBehaviour
     {
         [Header("Entry References")]
@@ -21,13 +26,16 @@ namespace UnityEngine.XR.ARFoundation.Samples
         TextMeshProUGUI m_AnchorDisplayLabel;
         public string AnchorDisplayText => m_AnchorDisplayLabel.text;
 
+        [SerializeField]
+        TextMeshProUGUI m_AnchorSavedDateLabel;
+
         [Header("Action Button References")]
         [SerializeField]
         GameObject m_ActionButtonText;
 
         [SerializeField]
         GameObject m_ActionButtonIcon;
-        
+
         [SerializeField]
         LoadingVisualizer m_ActionLoadingVisualizer;
 
@@ -36,14 +44,14 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         [SerializeField]
         GameObject m_ActionErrorVisualizer;
-        
+
         [Header("Erase Button References")]
         [SerializeField]
         GameObject m_EraseButtonIcon;
 
         [SerializeField]
         LoadingVisualizer m_EraseLoadingVisualizer;
-        
+
         [SerializeField]
         GameObject m_EraseSuccessVisualizer;
 
@@ -52,7 +60,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         public ARAnchor representedAnchor { get; set; }
 
-        public SerializableGuid persistentAnchorGuid { get; set; }
+        public SerializableGuid savedAnchorGuid { get; set; }
 
         [SerializeField, Tooltip("The event raised when the action button is clicked.")]
         UnityEvent<AnchorScrollViewEntry> m_RequestAction = new();
@@ -77,7 +85,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
             m_ActionButtonIcon.SetActive(true);
             m_ActionButtonText.SetActive(true);
         }
-        
+
         public void StartEraseLoadingAnimation()
         {
             m_EraseButtonIcon.SetActive(false);
@@ -105,7 +113,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
             m_EraseButton.gameObject.SetActive(isOn);
         }
 
-        public async Task ShowActionResult(bool isSuccessful, float durationInSeconds)
+        public async Awaitable ShowActionResult(bool isSuccessful, float durationInSeconds)
         {
             var visualizer = isSuccessful ? m_ActionSuccessVisualizer : m_ActionErrorVisualizer;
             visualizer.SetActive(true);
@@ -114,7 +122,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
             try
             {
-                await Task.Delay((int)(durationInSeconds * 1000), m_CancellationTokenSource.Token);
+                await Awaitable.WaitForSecondsAsync(durationInSeconds, m_CancellationTokenSource.Token);
             }
             catch (OperationCanceledException)
             {
@@ -126,7 +134,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
             m_ActionButtonIcon.SetActive(true);
         }
 
-        public async Task ShowEraseResult(bool isSuccessful, float durationInSeconds)
+        public async Awaitable ShowEraseResult(bool isSuccessful, float durationInSeconds)
         {
             var visualizer = isSuccessful ? m_EraseSuccessVisualizer : m_EraseErrorVisualizer;
             visualizer.SetActive(true);
@@ -134,7 +142,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
             try
             {
-                await Task.Delay((int)(durationInSeconds * 1000), m_CancellationTokenSource.Token);
+                await Awaitable.WaitForSecondsAsync(durationInSeconds, m_CancellationTokenSource.Token);
             }
             catch (OperationCanceledException)
             {
@@ -148,6 +156,15 @@ namespace UnityEngine.XR.ARFoundation.Samples
         public void SetDisplayedAnchorLabel(string label)
         {
             m_AnchorDisplayLabel.text = label;
+        }
+
+        public void SetAnchorSavedDateTime(DateTime dateTime)
+        {
+            var formattedDateTime = string.Format(
+                "{0:d}\n<color=#bbb>{0:t}</color>",
+                dateTime);
+
+            m_AnchorSavedDateLabel.text = formattedDateTime;
         }
 
         void OnEnable()

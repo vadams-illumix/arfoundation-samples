@@ -20,6 +20,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
             EnvironmentDepthSmooth = 1,
             HumanDepth = 2,
             HumanStencil = 3,
+            Confidence = 4,
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         /// <summary>
         /// The display rotation matrix for the shader.
-        /// </summary.
+        /// </summary>
         Matrix4x4 m_DisplayRotationMatrix = Matrix4x4.identity;
 
 #if UNITY_ANDROID
@@ -154,6 +155,18 @@ namespace UnityEngine.XR.ARFoundation.Samples
         Material m_StencilMaterial;
 
         /// <summary>
+        /// The confidence material for rendering confidence textures.
+        /// </summary>
+        public Material confidenceMaterial
+        {
+            get => m_ConfidenceMaterial;
+            set => m_ConfidenceMaterial = value;
+        }
+
+        [SerializeField]
+        Material m_ConfidenceMaterial;
+
+        /// <summary>
         /// The max distance value for the shader when showing an environment depth texture.
         /// </summary>
         public float maxEnvironmentDistance
@@ -195,17 +208,21 @@ namespace UnityEngine.XR.ARFoundation.Samples
             // When enabled, get the current screen orientation, and update the raw image UI.
             m_CurrentScreenOrientation = Screen.orientation;
             UpdateRawImage();
+
+            Application.onBeforeRender += OnBeforeRender;
         }
 
         void OnDisable()
         {
+            Application.onBeforeRender -= OnBeforeRender;
+
             // Unsubscribe from the camera frame received event, and initialize the display rotation matrix.
             m_DisplayRotationMatrix = Matrix4x4.identity;
             if (m_CameraManager != null)
                 m_CameraManager.frameReceived -= OnCameraFrameEventReceived;
         }
 
-        void Update()
+        void OnBeforeRender()
         {
             // If we are on a device that does supports neither human stencil, human depth, nor environment depth,
             // display a message about unsupported functionality and return.
@@ -214,6 +231,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
             var descriptor = m_OcclusionManager.descriptor;
             switch (m_DisplayMode)
             {
+                case DisplayMode.Confidence:
+                    break;
                 case DisplayMode.HumanDepth:
                 case DisplayMode.HumanStencil:
                 {
@@ -276,13 +295,21 @@ namespace UnityEngine.XR.ARFoundation.Samples
             // Get all of the occlusion textures.
             Texture2D humanStencil = m_OcclusionManager.humanStencilTexture;
             Texture2D humanDepth = m_OcclusionManager.humanDepthTexture;
-            Texture2D envDepth = m_OcclusionManager.environmentDepthTexture;
+            if (!m_OcclusionManager.TryGetEnvironmentDepthTexture(out var envDepth))
+            {
+                envDepth = null;
+            }
+            Texture2D envDepth2D = envDepth as Texture2D;
+            Texture2D confidence2D = null;
+            if (m_OcclusionManager.TryGetEnvironmentDepthConfidenceTexture(out var confidenceGpuTex))
+                confidence2D = confidenceGpuTex.texture as Texture2D;
 
             // Display some text information about each of the textures.
             m_StringBuilder.Clear();
             BuildTextureInfo(m_StringBuilder, "stencil", humanStencil);
             BuildTextureInfo(m_StringBuilder, "depth", humanDepth);
-            BuildTextureInfo(m_StringBuilder, "env", envDepth);
+            BuildTextureInfo(m_StringBuilder, "env", envDepth2D);
+            BuildTextureInfo(m_StringBuilder, "confidence", confidence2D);
 
             LogText(m_StringBuilder.ToString());
 
@@ -290,6 +317,9 @@ namespace UnityEngine.XR.ARFoundation.Samples
             Texture2D displayTexture;
             switch (m_DisplayMode)
             {
+                case DisplayMode.Confidence:
+                    displayTexture = confidence2D;
+                    break;
                 case DisplayMode.HumanStencil:
                     displayTexture = humanStencil;
                     break;
@@ -299,7 +329,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
                 case DisplayMode.EnvironmentDepthRaw:
                 case DisplayMode.EnvironmentDepthSmooth:
                 default:
-                    displayTexture = envDepth;
+                    displayTexture = envDepth2D;
                     break;
             }
 
@@ -424,10 +454,13 @@ namespace UnityEngine.XR.ARFoundation.Samples
             }
 
             // Determine the raw image material and maxDistance material parameter based on the display mode.
-            float maxDistance;
+            float maxDistance = m_MaxEnvironmentDistance;
             Material material;
             switch (m_DisplayMode)
             {
+                case DisplayMode.Confidence:
+                    material = m_ConfidenceMaterial;
+                    break;
                 case DisplayMode.HumanStencil:
                     material = m_StencilMaterial;
                     maxDistance = m_MaxHumanDistance;
@@ -446,8 +479,11 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
             // Update the raw image dimensions and the raw image material parameters.
             m_RawImage.rectTransform.sizeDelta = rectSize;
-            material.SetFloat(k_MaxDistanceId, maxDistance);
-            material.SetMatrix(k_DisplayRotationPerFrameId, m_DisplayRotationMatrix);
+            if (material != null)
+            {
+                material.SetFloat(k_MaxDistanceId, maxDistance);
+                material.SetMatrix(k_DisplayRotationPerFrameId, m_DisplayRotationMatrix);
+            }
             m_RawImage.material = material;
         }
 

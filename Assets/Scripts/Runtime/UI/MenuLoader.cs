@@ -1,6 +1,8 @@
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.ARSubsystems;
+#if OPENXR_1_13_OR_NEWER
 using UnityEngine.XR.OpenXR;
+#endif // OPENXR_1_13_OR_NEWER
 
 namespace UnityEngine.XR.ARFoundation.Samples
 {
@@ -13,6 +15,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
         const string k_DefaultMenuScene = "Menu";
         const string k_MetaMenuScene = "MetaMenu";
         const string k_HololensMenuScene = "HololensMenu";
+        const string k_AndroidXRMenuScene = "AndroidXRMenu";
 
         void Awake()
         {
@@ -21,10 +24,12 @@ namespace UnityEngine.XR.ARFoundation.Samples
 
         public static string GetMenuSceneName()
         {
+#if OPENXR_1_13_OR_NEWER
             if (Application.platform == RuntimePlatform.WSAPlayerARM && OpenXRRuntime.name == "Windows Mixed Reality Runtime") 
             {
                 return k_HololensMenuScene;
             }
+#endif // OPENXR_1_13_OR_NEWER
 
             var loader = LoaderUtility.GetActiveLoader();
             var sessionSubsystem = loader != null ? loader.GetLoadedSubsystem<XRSessionSubsystem>() : null;
@@ -43,6 +48,8 @@ namespace UnityEngine.XR.ARFoundation.Samples
             {
                 case "Meta-Session":
                     return k_MetaMenuScene;
+                case "Android-Session":
+                    return k_AndroidXRMenuScene;
                 case "ARKit-Session":
                 case "ARCore-Session":
                 case "XRSimulation-Session":
@@ -55,7 +62,7 @@ namespace UnityEngine.XR.ARFoundation.Samples
         public static bool IsHmdDevice()
         {
             var sceneName = GetMenuSceneName();
-            return (sceneName == k_MetaMenuScene) || (sceneName == k_HololensMenuScene);
+            return (sceneName == k_MetaMenuScene) || (sceneName == k_HololensMenuScene) || (sceneName == k_AndroidXRMenuScene);
         }
 
         public static void LoadMenuScene()

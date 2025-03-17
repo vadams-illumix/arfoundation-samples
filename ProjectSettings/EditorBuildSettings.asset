@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu/HoloLensMenu.unity
     guid: a5fd9af6d753348da8ef1ab744ad4110
   - enabled: 1
+    path: Assets/Scenes/Menu/AndroidXRMenu.unity
+    guid: 4de61a04c3fb340879e7040f9522fcd6
+  - enabled: 1
     path: Assets/Scenes/ARKit/ARCollaborationData/ARCollaborationData.unity
     guid: 900e7bfe6122645fba71b90941afb9c5
   - enabled: 1
@@ -53,6 +56,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Occlusion/SimpleOcclusion/SimpleOcclusion.unity
     guid: 50a69364b393d4ce8a8b3589422b67b7
+  - enabled: 1
+    path: Assets/Scenes/Occlusion/HMDOcclusion/HMDOcclusion.unity
+    guid: a7e4b7ddb1e5d824596f8e18b9eaea09
   - enabled: 1
     path: Assets/Scenes/EnvironmentProbes/EnvironmentProbes.unity
     guid: d568d188cadf141e38769dbabd3fe385
@@ -153,20 +159,11 @@ EditorBuildSettings:
     path: Assets/Scenes/Camera/ExifData/ExifData.unity
     guid: 668735f787b9248c2bee5111449a40bf
   - enabled: 1
-    path: Assets/Scenes/VisualScripting/VS_SimpleAR/VS_SimpleAR.unity
-    guid: fc598c11c6a3a42e7ae39f4319d4fb4b
+    path: Assets/Scenes/BoundingBoxDetection/BoundingBoxes.unity
+    guid: e5d8c18ab0c954fd4a7aee48dffe9836
   - enabled: 1
-    path: Assets/Scenes/VisualScripting/VS_GetTrackables/VS_GetTrackables.unity
-    guid: 43a3bf9112387472d98302b0520a8a7f
-  - enabled: 1
-    path: Assets/Scenes/VisualScripting/VS_GetTrackablesUserFacing/VS_GetTrackablesUserFacing.unity
-    guid: 273e6fd77d23b42d9956aba7e5f35fca
-  - enabled: 1
-    path: Assets/Scenes/VisualScripting/VS_OnTrackablesChanged/VS_OnTrackablesChanged.unity
-    guid: 93c05967a7724427d962fd9de9a585d1
-  - enabled: 1
-    path: Assets/Scenes/VisualScripting/VS_OnTrackablesChangedUserFacing/VS_OnTrackablesChangedUserFacing.unity
-    guid: d966c4d085949488799fa16be4c4455e
+    path: Assets/Scenes/Meta/MetaOcclusion.unity
+    guid: e8c7226bb201745eaba536ed20b8b529
   - enabled: 1
     path: Assets/Scenes/Meta/MetaSceneCapture.unity
     guid: 8d6a8fd41189d4105b00ec3d1b95330d
@@ -174,8 +171,14 @@ EditorBuildSettings:
     path: Assets/Scenes/Meta/MetaDisplayRefreshRate.unity
     guid: 07970a1a9455f4309b8e99b1c88daa98
   - enabled: 1
-    path: Assets/Scenes/BoundingBoxDetection/BoundingBoxes.unity
-    guid: e5d8c18ab0c954fd4a7aee48dffe9836
+    path: Assets/Scenes/Meta/MetaBoundaryVisibility.unity
+    guid: 539a721aa9dc84c4b948e0dc82d9ba94
+  - enabled: 1
+    path: Assets/Scenes/Camera/CameraTorchMode/CameraTorchMode.unity
+    guid: ee0cc5dcbc42d5044a743cc572c4f8f1
+  - enabled: 1
+    path: Assets/Scenes/Anchors/TestAnchors.unity
+    guid: 59827dbbb0f3741848771ee28a1081d3
   m_configObjects:
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: c52d3bb36b4c86f47af54ab9c7a02589,
       type: 2}
@@ -191,6 +194,6 @@ EditorBuildSettings:
       type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: e2f869774b12e400996eb546603602e3,
       type: 2}
-    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 2d2dec64879445247bb34603b4469c6c,
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 07124a6b2286348128e5aecd8a4b3b80,
       type: 2}
   m_UseUCBPForAssetBundles: 0
